@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { User } from "../data/user/app.user";
 
 @Component({
   selector: 'app-navigation',
@@ -13,4 +14,9 @@ export class NavigationComponent implements OnInit {
   ngOnInit(): void {
   }
 
+  async tryFetch() {
+    User.getUsers().then(users => {
+      console.log(users);
+    });
+  }
 }
