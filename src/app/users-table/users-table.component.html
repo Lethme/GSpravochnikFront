@@ -38,16 +38,40 @@
             <th scope="col">Name</th>
             <th scope="col">Company</th>
             <th scope="col">Phone</th>
+            <th scope="col">Update date</th>
+            <th scope="col">Creation date</th>
         </tr>
     </thead>
     <tbody>
-        <tr *ngFor="let node of nodes; index as i">
-            <th scope="row">{{ node.user_id }}</th>
+        <tr *ngFor="let node of getPagedNodes(); index as i">
+            <th scope="row">{{ node.UserId }}</th>
             <td>
-                <a href="#" class="table-link" (click)="showCard(content, node.node_name, [])">{{ node.node_last_name + ' ' + node.node_name + ' ' + node.node_patronymic }}</a>
+                <a href="#" class="table-link" (click)="showCard(content, node.Name, [])">{{ node.LastName + ' ' + node.Name + ' ' + node.Patronymic }}</a>
             </td>
-            <td>{{ node.node_company }}</td>
-            <td>{{ node.node_phone | phone:'RU' }}</td>
+            <td>{{ node.Company }}</td>
+            <td>{{ node.Phone| phone:'RU' }}</td>
+            <td>{{ node.LastUpdateDate | date }}</td>
+            <td>{{ node.CreationDate| date }}</td>
         </tr>
     </tbody>
 </table>
+
+<div class="d-flex justify-content-between p-2">
+    <ngb-pagination [collectionSize]="collectionSize" [(page)]="page" [directionLinks]="false" [pageSize]="pageSize"></ngb-pagination>
+
+    <div ngbDropdown class="d-inline-block">
+        <button ngDefaultControl class="btn btn-outline-primary" id="dropdownBasic1" ngbDropdownToggle [(ngModel)]="pageSize">{{ dd.children.item(selectedItem)!.innerHTML }}</button>
+        <div #dd ngbDropdownMenu aria-labelledby="dropdownBasic1">
+            <button ngbDropdownItem (click)="pageSize = 3; selectedItem = 0;">3 items per page</button>
+            <button ngbDropdownItem (click)="pageSize = 4; selectedItem = 1;">4 items per page</button>
+            <button ngbDropdownItem (click)="pageSize = 5; selectedItem = 2;">5 items per page</button>
+            <button ngbDropdownItem (click)="pageSize = 6; selectedItem = 3;">6 items per page</button>
+            <button ngbDropdownItem (click)="pageSize = 7; selectedItem = 4;">7 items per page</button>
+        </div>
+    </div>
+    <!-- <select class="custom-select" style="width: auto" [(ngModel)]="pageSize">
+      <option [ngValue]="2">2 items per page</option>
+      <option [ngValue]="4">4 items per page</option>
+      <option [ngValue]="6">6 items per page</option>
+    </select> -->
+</div>

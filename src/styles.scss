@@ -1,13 +1,28 @@
 @import '~bootstrap/scss/bootstrap';
 @import '~hamburgers/_sass/hamburgers/hamburgers.scss';
-
 body {
-  box-sizing: border-box;
-  height: 100vh !important;
-  //display: flex;
-  //justify-content: center;
-  //align-items: center;
+    box-sizing: border-box;
+    height: 100vh !important;
+    //display: flex;
+    //justify-content: center;
+    //align-items: center;
 }
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+html,
+body {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+.visually-hidden {
+    display: none !important;
+}
+
+.modal-xl {
+    max-width: 1200px !important;
+    padding: 0 15px !important;
+}
