@@ -11,6 +11,13 @@
     color: #000B;
 }
 
+.table {
+    border: 1px solid #dee2e6;
+    border-radius: 1rem;
+}
+
+.form-group,
+.input-group,
 .card-input {
-    width: 100%;
+    width: 100% !important;
 }

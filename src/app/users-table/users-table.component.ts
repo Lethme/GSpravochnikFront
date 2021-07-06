@@ -1,6 +1,14 @@
 import { Component, Input, TemplateRef } from '@angular/core';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbDateStruct, NgbTimeStruct } from '@ng-bootstrap/ng-bootstrap';
 import { Node } from '../data/node/app.node';
+
+export interface ICardInfo {
+  type: 'msg' | 'ti' | 'dp' | 'tp';
+  title: string;
+  date: Date;
+  time: NgbTimeStruct;
+  cardLines: Array<string>;
+}
 
 const Nodes: Array<Node> = [
   Node.Create(0, 0, 'Dimass', 'Semochkin', 'Olegovich', 'No Walls Production', '88005553535', new Date(), new Date()),
@@ -17,24 +25,63 @@ const Nodes: Array<Node> = [
   styleUrls: ['./users-table.component.scss']
 })
 export class UsersTableComponent {
-  title: string = 'Card title';
-  cardLines: Array<string> = ['Card line'];
+  card: ICardInfo = {
+    type: 'msg',
+    title: 'Card Title',
+    date: new Date(),
+    time: { hour: 0, minute: 0, second: 0 },
+    cardLines: []
+  }
+
   nodes: Array<Node> = Nodes;
   page = 1;
-  pageSize = 3;
-  selectedItem = 0;
+  pageSize: Array<number> = [ 2, 4, 6, 8, 10 ];
+  selectedItem = 1;
+
+  model: NgbDateStruct | undefined;
 
   get collectionSize(): number { return this.nodes.length; }
+  get currentPageSize(): number { return this.pageSize[this.selectedItem]; }
 
   getPagedNodes(): Array<Node> {
-    return this.nodes.slice((this.page - 1) * this.pageSize, (this.page - 1) * this.pageSize + this.pageSize);
+    return this.nodes.slice((this.page - 1) * this.currentPageSize, (this.page - 1) * this.currentPageSize + this.currentPageSize);
   }
 
   constructor(public modalService: NgbModal) {}
 
-  public showCard(content: TemplateRef<any>, title: string, cardLines: Array<string>) {
-    this.title = title;
-    this.cardLines = cardLines;
+  public showMsg(content: TemplateRef<any>, title: string = 'Card Title', cardLine: Array<string> = []) {
+    this.card.type = 'msg';
+    this.card.title = title;
+    this.card.cardLines = cardLine;
+    this.modalService.open(content, {
+      size: 'xl',
+      centered: true
+    });
+  }
+
+  public showTextInput(content: TemplateRef<any>, title: string = 'Card Title') {
+    this.card.type = 'ti';
+    this.card.title = title;
+    this.modalService.open(content, {
+      size: 'xl',
+      centered: true
+    });
+  }
+
+  public showDatePicker(content: TemplateRef<any>, title: string = 'Card Title', date: Date = new Date()) {
+    this.card.type = 'dp';
+    this.card.title = title;
+    this.card.date = date;
+    this.modalService.open(content, {
+      size: 'xl',
+      centered: true
+    });
+  }
+
+  public showTimePicker(content: TemplateRef<any>, title: string = 'Card Title', time: NgbTimeStruct = { hour: 0, minute: 0, second: 0 }) {
+    this.card.type = 'tp';
+    this.card.title = title;
+    this.card.time = time;
     this.modalService.open(content, {
       size: 'xl',
       centered: true
@@ -42,6 +89,6 @@ export class UsersTableComponent {
   }
 
   test(e: HTMLInputElement, index: number) {
-    this.cardLines[index] = e.value;
+    this.card.cardLines[index] = e.value;
   }
 }

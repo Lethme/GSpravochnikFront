@@ -1,17 +1,32 @@
 <ng-template #content let-modal>
     <div class="modal-header">
-        <h4 class="modal-title">{{ title }}</h4>
+        <h4 class="modal-title">{{ card.title }}</h4>
         <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')" style="outline: none;">
         <span class="card-close-times" aria-hidden="true">&times;</span>
       </button>
     </div>
-    <div class="modal-body">
-        <p class="modal-body-line" *ngFor='let line of cardLines; index as i;'>
-            <mat-form-field class="example-full-width card-input" appearance="fill">
-                <mat-label>{{ line }}</mat-label>
-                <input matInput #cardInput [name]="title" [placeholder]="line" [value]="line" (change)="test(cardInput, i);">
-            </mat-form-field>
-        </p>
+    <div class="modal-body" [ngSwitch]="card.type">
+        <div *ngSwitchCase="'msg'">
+            <p class="modal-body-line" *ngFor='let line of card.cardLines; index as i;'>
+                <mat-form-field class="example-full-width card-input" appearance="fill">
+                    <mat-label>{{ line }}</mat-label>
+                    <input matInput #cardInput [name]="card.title" [placeholder]="line" [value]="line" (change)="test(cardInput, i);">
+                </mat-form-field>
+            </p>
+        </div>
+        <form *ngSwitchCase="'dp'" class="form-inline">
+            <div class="form-group">
+                <div class="input-group">
+                    <input class="form-control" placeholder="yyyy-mm-dd" name="dp" [(ngModel)]="model" ngbDatepicker #d="ngbDatepicker">
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary calendar" (click)="d.toggle()" type="button"></button>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <div *ngSwitchCase="'tp'">
+            <ngb-timepicker [(ngModel)]="card.time" [seconds]="true"></ngb-timepicker>
+        </div>
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-light" onclick="alert('Not implemented yet')">Edit</button>
@@ -46,27 +61,27 @@
         <tr *ngFor="let node of getPagedNodes(); index as i">
             <th scope="row">{{ node.UserId }}</th>
             <td>
-                <a href="#" class="table-link" (click)="showCard(content, node.Name, [])">{{ node.LastName + ' ' + node.Name + ' ' + node.Patronymic }}</a>
+                <a href="#" class="table-link" (click)="showMsg(content, node.Name, [])">{{ node.LastName + ' ' + node.Name + ' ' + node.Patronymic }}</a>
             </td>
             <td>{{ node.Company }}</td>
             <td>{{ node.Phone| phone:'RU' }}</td>
-            <td>{{ node.LastUpdateDate | date }}</td>
-            <td>{{ node.CreationDate| date }}</td>
+            <td>
+                <a href="#" class="table-link" (click)="showDatePicker(content, node.Name)">{{ node.LastUpdateDate | date }}</a>
+            </td>
+            <td>
+                <a href="#" class="table-link" (click)="showDatePicker(content, node.Name)">{{ node.CreationDate | date }}</a>
+            </td>
         </tr>
     </tbody>
 </table>
 
 <div class="d-flex justify-content-between p-2">
-    <ngb-pagination [collectionSize]="collectionSize" [(page)]="page" [directionLinks]="false" [pageSize]="pageSize"></ngb-pagination>
+    <ngb-pagination [collectionSize]="collectionSize" [(page)]="page" [directionLinks]="false" [pageSize]="pageSize[selectedItem]"></ngb-pagination>
 
     <div ngbDropdown class="d-inline-block">
-        <button ngDefaultControl class="btn btn-outline-primary" id="dropdownBasic1" ngbDropdownToggle [(ngModel)]="pageSize">{{ dd.children.item(selectedItem)!.innerHTML }}</button>
+        <button ngDefaultControl class="btn btn-outline-primary" id="dropdownBasic1" ngbDropdownToggle [(ngModel)]="pageSize">{{ currentPageSize }} items per page</button>
         <div #dd ngbDropdownMenu aria-labelledby="dropdownBasic1">
-            <button ngbDropdownItem (click)="pageSize = 3; selectedItem = 0;">3 items per page</button>
-            <button ngbDropdownItem (click)="pageSize = 4; selectedItem = 1;">4 items per page</button>
-            <button ngbDropdownItem (click)="pageSize = 5; selectedItem = 2;">5 items per page</button>
-            <button ngbDropdownItem (click)="pageSize = 6; selectedItem = 3;">6 items per page</button>
-            <button ngbDropdownItem (click)="pageSize = 7; selectedItem = 4;">7 items per page</button>
+            <button *ngFor="let size of pageSize; index as i;" ngbDropdownItem (click)="selectedItem = i;">{{ size }} items per page</button>
         </div>
     </div>
     <!-- <select class="custom-select" style="width: auto" [(ngModel)]="pageSize">
