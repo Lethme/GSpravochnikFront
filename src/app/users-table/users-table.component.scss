@@ -18,6 +18,12 @@
 
 .form-group,
 .input-group,
-.card-input {
+.card-input,
+.full-width {
     width: 100% !important;
+}
+
+.form-inline {
+    display: flex;
+    flex-direction: column;
 }

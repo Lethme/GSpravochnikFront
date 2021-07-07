@@ -27,4 +27,21 @@ export class User implements IUser {
       });
     });
   }
+
+  public static async authorizeUser(login: string, password: string) {
+    return new Promise(resolve => {
+      fetch('//3.122.244.77/api/1.1/auth', {
+        method: 'POST',
+        headers: {
+          'Content-type': 'application/x-www-form-urlencoded; charset=UTF8'
+        },
+        body: JSON.stringify({
+          userLogin: login,
+          userPassword: password
+        })
+       }).then(res => res.json()).then(res => {
+        console.log(res);
+       })
+    });
+  }
 }

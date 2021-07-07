@@ -1,8 +1,12 @@
 <app-navigation></app-navigation>
 
-<div class="container">
+<div class="container" [ngClass]="{
+    'small': showAuthForm
+}">
     <div class="content" style="width: 100%">
-        <!--    <app-nav></app-nav>-->
-        <app-users-table style="width: 100%"></app-users-table>
+        <app-login-form *ngIf="showAuthForm; else usersTable;"></app-login-form>
+        <ng-template #usersTable>
+            <app-users-table style="width: 100%"></app-users-table>
+        </ng-template>
     </div>
 </div>

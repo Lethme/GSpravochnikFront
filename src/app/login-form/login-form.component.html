@@ -1,0 +1,31 @@
+<div class="login-form">
+    <mat-card class="login-card">
+        <mat-card-content>
+            <h2 style="text-align: center;">{{ register ? 'Registration' : 'Login' }}</h2>
+            <form class="login-form">
+                <mat-form-field class="full-width">
+                    <mat-label>Login</mat-label>
+                    <input #loginField matInput placeholder="Login" name="login" required>
+                </mat-form-field>
+                <mat-form-field class="full-width">
+                    <mat-label>Password</mat-label>
+                    <input #passField type="password" matInput placeholder="Password" name="pass" required>
+                </mat-form-field>
+                <mat-form-field class="full-width" *ngIf="register">
+                    <mat-label>Confirm Password</mat-label>
+                    <input #repassField type="password" matInput placeholder="Confirm Password" name="repass" required>
+                </mat-form-field>
+            </form>
+        </mat-card-content>
+        <mat-card-actions class="login-form-btns">
+            <div *ngIf="!register; else registerBtns;">
+                <button mat-raised-button (click)="auth(loginField.value, passField.value)" color="primary">Login</button>
+                <button mat-raised-button (click)="registerSwitch()" color="primary">Registration</button>
+            </div>
+            <ng-template #registerBtns>
+                <button mat-raised-button onclick="alert('Registration is not working yet')" color="primary">Register</button>
+                <button mat-raised-button (click)="registerSwitch()" color="primary">Back</button>
+            </ng-template>
+        </mat-card-actions>
+    </mat-card>
+</div>

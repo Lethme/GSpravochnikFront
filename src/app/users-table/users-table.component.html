@@ -27,24 +27,18 @@
         <div *ngSwitchCase="'tp'">
             <ngb-timepicker [(ngModel)]="card.time" [seconds]="true"></ngb-timepicker>
         </div>
+        <form *ngSwitchCase="'ti'" class="form-inline">
+            <mat-form-field class="full-width" *ngFor="let value of card.cardLines; index as i;">
+                <mat-label>{{ card.colTitles[i] }}</mat-label>
+                <input matInput [placeholder]="card.colTitles[i]" name="login" [value]="value" required>
+            </mat-form-field>
+        </form>
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-light" onclick="alert('Not implemented yet')">Edit</button>
         <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Close</button>
     </div>
 </ng-template>
-
-<!-- {
-    user_id: 0,
-    node_id: 0,
-    node_name: 'Ivan',
-    node_last_name: 'Ivanov',
-    node_patronymic: 'Ivanovich',
-    node_company: 'No Walls Production',
-    node_phone: '88005553535',
-    node_create_date: new Date(),
-    node_update_date: new Date()
-  } -->
 
 <table class="table table-striped">
     <thead>
@@ -61,7 +55,15 @@
         <tr *ngFor="let node of getPagedNodes(); index as i">
             <th scope="row">{{ node.UserId }}</th>
             <td>
-                <a href="#" class="table-link" (click)="showMsg(content, node.Name, [])">{{ node.LastName + ' ' + node.Name + ' ' + node.Patronymic }}</a>
+                <a href="#" class="table-link" (click)="showTextInput(content, node.Name, [
+                    'Last Name',
+                    'First Name',
+                    'Patronymic'
+                ], [
+                    node.LastName,
+                    node.Name,
+                    node.Patronymic
+                ])">{{ node.LastName + ' ' + node.Name + ' ' + node.Patronymic }}</a>
             </td>
             <td>{{ node.Company }}</td>
             <td>{{ node.Phone| phone:'RU' }}</td>

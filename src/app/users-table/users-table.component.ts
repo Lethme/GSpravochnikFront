@@ -8,6 +8,7 @@ export interface ICardInfo {
   date: Date;
   time: NgbTimeStruct;
   cardLines: Array<string>;
+  colTitles: Array<string>;
 }
 
 const Nodes: Array<Node> = [
@@ -30,7 +31,8 @@ export class UsersTableComponent {
     title: 'Card Title',
     date: new Date(),
     time: { hour: 0, minute: 0, second: 0 },
-    cardLines: []
+    cardLines: [''],
+    colTitles: ['']
   }
 
   nodes: Array<Node> = Nodes;
@@ -59,9 +61,11 @@ export class UsersTableComponent {
     });
   }
 
-  public showTextInput(content: TemplateRef<any>, title: string = 'Card Title') {
+  public showTextInput(content: TemplateRef<any>, title: string = 'Card Title', colTitles: Array<string> = [''], cellValues: Array<string> = ['']) {
     this.card.type = 'ti';
     this.card.title = title;
+    this.card.colTitles = colTitles;
+    this.card.cardLines = cellValues;
     this.modalService.open(content, {
       size: 'xl',
       centered: true

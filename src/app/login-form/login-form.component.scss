@@ -1,0 +1,28 @@
+* {
+    font-family: 'Montserrat', sans-serif;
+}
+
+input::selection {
+    background: rgba(103, 58, 183, .9);
+    color: white;
+}
+
+.login-card,
+.full-width {
+    width: 100%;
+}
+
+.login-form,
+.login-form-btns {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-form {
+    flex-direction: column;
+}
+
+.login-form-btns {
+    flex-direction: row;
+}
