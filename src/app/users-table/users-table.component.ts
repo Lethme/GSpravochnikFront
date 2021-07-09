@@ -56,7 +56,7 @@ export class UsersTableComponent {
     node: null
   }
   page: IPageInfo = {
-    index: this.api.PageIndex,
+    index: 1,
     size: [ 2, 4, 6, 8, 10 ],
     collectionSize: 0,
     sizeDropdownSelectedItem: this.api.SizeDropDownItem
@@ -73,20 +73,22 @@ export class UsersTableComponent {
   nodes: Array<Node> = Nodes;
   model: NgbDateStruct | undefined;
 
-  constructor(public modalService: NgbModal, private http: HttpClient, private cookie: CookieService, public api: API) {}
-  ngOnInit(): void {
-    this.apiGetNodes();
+  constructor(public modalService: NgbModal, private http: HttpClient, private cookie: CookieService, public api: API) {
   }
-  
-  get collectionSize(): number { return this.nodes.length; }
+  ngOnInit(): void {
+    if (this.api.getData<any>(this.api.StoragePageIndex) === undefined) {
+      this.api.PageIndex = this.page.index;
+    }
+    if (this.api.getData<any>(this.api.StorageSizeDropDownItem) === undefined) {
+      this.api.SizeDropDownItem = this.page.sizeDropdownSelectedItem;
+    }
+    this.apiGetPageNodes();
+  }
+
   get currentPageSize(): number { return this.page.size[this.page.sizeDropdownSelectedItem]; }
   get userToken(): string { return this.cookie.get('authToken'); }
   
   public get userName(): string { return this.cookie.get('authLogin'); }
-
-  getPagedNodes(): Array<Node> {
-    return this.nodes.slice((this.page.index - 1) * this.currentPageSize, (this.page.index - 1) * this.currentPageSize + this.currentPageSize);
-  }
 
   apiGetNodes() {
     if (this.api.Authorized) {
@@ -115,14 +117,27 @@ export class UsersTableComponent {
     }
   }
 
-//nodes?pageSize={pageSize}&pageNum={pageNum}
-
   apiGetPageNodes() {
     if (this.api.Authorized) {
       this.api.Loading = true;
-      this.http.get<any>(this.api.getUrl('nodes?pageSize=' + this.currentPageSize + '&pageNum=' + this.page.index), {
+      this.http.get<any>(this.api.getUrl('nodes', {
+        pageSize: this.currentPageSize,
+        pageNum: this.api.PageIndex
+      }), {
         headers: this.api.AuthHeader
       }).subscribe(data => {
+        let nodesCount: number = data.meta.count;
+        let arr: Array<any> = data.data;
+        let arr1: Array<INode> = arr.map(node => {
+          return node.attributes;
+        });
+        if (arr1[0] !== undefined) {
+          this.nodes = arr1.map(node => Node.Create(node));
+        } else {
+          this.nodes = [];
+        }
+        this.page.index = this.api.PageIndex;
+        this.page.collectionSize = nodesCount;
         this.api.Loading = false;
       }, err => {
         console.log(err);
@@ -146,7 +161,10 @@ export class UsersTableComponent {
         isPublic: node?.Public
       }), {
         headers: this.api.AuthHeader
-      }).subscribe(data => { this.api.Loading = false; }, err => {
+      }).subscribe(data => {
+        this.apiGetPageNodes();
+        this.api.Loading = false;
+      }, err => {
         let status: number = err.status;
         switch(status) {
           case 400: {
@@ -171,7 +189,7 @@ export class UsersTableComponent {
       this.http.delete<any>(this.api.getUrl('nodes/' + nodeId), {
         headers: this.api.AuthHeader
       }).subscribe(data => { 
-        this.apiGetNodes();
+        this.apiGetPageNodes();
         this.api.Loading = false;
       }, err => {
         let status: number = err.status;
@@ -210,7 +228,7 @@ export class UsersTableComponent {
         if (this.page.collectionSize % this.currentPageSize === 1) {
           this.page.index++;
         }
-        this.apiGetNodes();
+        this.apiGetPageNodes();
       }, err => {
         let status: number = err.status;
         switch(status) {
@@ -267,7 +285,6 @@ export class UsersTableComponent {
       node.Update(newNode);
     }
     this.apiSetNode(nodeId, node);
-    this.apiGetNodes();
   }
 
   addNode(newNode: INewNode) {

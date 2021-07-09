@@ -1,3 +1,5 @@
+$blue:rgb(0, 123, 255);
+$borderRadius: .3rem;
 * {
     font-family: 'Montserrat', sans-serif;
 }
@@ -17,22 +19,41 @@
     color: #000B;
 }
 
+.close {
+    outline: none;
+}
+
 .table-edit,
 .table-delete {
-    color: #000;
     font-size: 1.3em;
     font-weight: 600;
     transition: all .2s ease;
     cursor: pointer;
 }
 
-.table-edit:hover,
-.table-delete:hover {
+.table-delete-header {
+    color: rgb(196, 59, 59);
+}
+
+.table-edit {
+    color: #000
+}
+
+.table-edit:hover {
     color: #0009;
 }
 
+.table-delete {
+    color: rgb(196, 59, 59);
+}
+
+.table-delete:hover {
+    color: rgb(196, 59, 59, .6);
+}
+
 .table {
-    border: 1px solid #dee2e6;
+    // border: 1px solid #dee2e6;
+    width: 100% !important;
     margin: 0 !important;
     padding: 0 !important;
     thead,
@@ -41,11 +62,27 @@
     }
 }
 
+.table-box {
+    border: 1px solid #dee2e6;
+    border-radius: $borderRadius;
+    margin-bottom: .5rem;
+}
+
+.btn:focus,
+.btn.focus {
+    box-shadow: none !important;
+}
+
 .dropdown-toggle,
 .dropdown-menu,
 ngb-pagination {
     font-size: .8rem !important;
     margin-bottom: 0 !important;
+}
+
+.dropdown-menu {
+    right: 0 !important;
+    left: auto !important;
 }
 
 .dropdown-toggle::after {
@@ -67,10 +104,12 @@ ngb-pagination {
 
 .add-node {
     width: 100%;
-    margin-bottom: .5rem;
+    // margin-bottom: .5rem;
     padding: .3rem 0;
-    border: 1px solid #dee2e6;
-    border-top: none;
+    // border: 1px solid #dee2e6;
+    border-top: 1px solid #dee2e6;
+    border-bottom-left-radius: $borderRadius;
+    border-bottom-right-radius: $borderRadius;
     display: flex;
     justify-content: center;
     background: #fff;
@@ -82,8 +121,39 @@ ngb-pagination {
     }
 }
 
-.add-node:hover {
+.add-node:hover,
+.add-node:active {
     background: rgb(0, 123, 255);
     color: #fff;
     box-shadow: 0px 0px 8px 4px rgba(34, 60, 80, 0.2) inset;
+}
+
+.search-input {
+    border-right: 1px solid#dee2e6 !important;
+    border-radius: 0;
+    border-top-left-radius: $borderRadius;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.search-box * {
+    // border-bottom: none !important;
+    border: none;
+    font-size: .9rem !important;
+}
+
+.search-btn {
+    border-left: 1px solid#dee2e6 !important;
+    border-radius: 0 !important;
+    border-top-right-radius: $borderRadius !important;
+    color: #000;
+    background: #fff !important;
+    transition: all .2s ease !important;
+}
+
+.search-btn:hover,
+.search-btn:active {
+    color: #fff;
+    background: rgb(0, 123, 255) !important;
+    box-shadow: 0px 0px 6px 1px rgba(34, 60, 80, 0.2) inset;
 }

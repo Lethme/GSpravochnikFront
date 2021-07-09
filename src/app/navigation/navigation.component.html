@@ -5,6 +5,11 @@
     </button>
     <div [ngbCollapse]="isNavbarCollapsed" class="collapse navbar-collapse justify-content-end" id="navbarsDefault">
         <ul class="navbar-nav">
+            <li class="nav-item">
+                <a href="#" class="nav-link" (click)="api.getUrl('nodes', {
+                    test: 5
+                })">Test</a>
+            </li>
             <li class="nav-item" *ngIf="!api.Authorized; else authorizedDropdown">
                 <a href="#" class="nav-link" (click)="showAuthForm()">Sign in</a>
             </li>

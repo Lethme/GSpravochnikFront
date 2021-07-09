@@ -20,7 +20,7 @@
 <ng-template #editRef let-modal>
     <div class="modal-header">
         <h4 class="modal-title">{{ card.type === 'edit' ? card.node!.Name : 'Node creation' }}</h4>
-        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')" style="outline: none;">
+        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
         <span class="card-close-times" aria-hidden="true">&times;</span>
       </button>
     </div>
@@ -58,7 +58,7 @@
             company: company.value,
             phone: phone.value,
             email: email.value
-         }); modal.close('Close click');">Apply</button>
+        }); modal.close('Close click');">Apply</button>
         <ng-template #addBtn>
             <button type="button" class="btn btn-light" (click)="addNode({
                 lastName: lastName.value,
@@ -73,40 +73,48 @@
     </div>
 </ng-template>
 
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th scope="col" *ngFor="let header of table.headers">{{ header }}</th>
-            <th scope="col">Edit</th>
-            <th scope="col">Delete</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr *ngFor="let node of getPagedNodes(); index as i">
-            <td>{{ node.LastName + ' ' + node.Name + ' ' + node.Patronymic }}</td>
-            <td>{{ node.Company }}</td>
-            <td>{{ node.Phone| phone:'RU' }}</td>
-            <td>{{ node.Email }}</td>
-            <td>
-                <span class="table-edit" (click)="showNodeEditor(editRef, node)">&#9998;</span>
-            </td>
-            <td>
-                <span class="table-delete" (click)="showConfirm(deleteRef, node);">&#10006;</span>
-            </td>
-        </tr>
-    </tbody>
-</table>
-<div class="add-node" (click)="showNewNodeEditor(editRef)">
-    <span class="add-node-symbol">&#10010;</span>
+<div class="table-box">
+    <div class="input-group search-box">
+        <input type="text" class="form-control search-input" placeholder="Type anything to find nodes" aria-label="Type anything to find nodes" aria-describedby="basic-addon2">
+        <div class="input-group-append">
+            <button class="input-group-text search-btn" id="basic-addon2">Search</button>
+        </div>
+    </div>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col" *ngFor="let header of table.headers">{{ header }}</th>
+                <th scope="col" class="table-edit-header">Edit</th>
+                <th scope="col" class="table-delete-header">Delete</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let node of nodes; index as i">
+                <td>{{ node.LastName + ' ' + node.Name + ' ' + node.Patronymic }}</td>
+                <td>{{ node.Company }}</td>
+                <td>{{ node.Phone| phone:'RU' }}</td>
+                <td>{{ node.Email }}</td>
+                <td>
+                    <span class="table-edit" (click)="showNodeEditor(editRef, node)">&#9998;</span>
+                </td>
+                <td>
+                    <span class="table-delete" (click)="showConfirm(deleteRef, node);">&#10006;</span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="add-node" (click)="showNewNodeEditor(editRef)">
+        <span class="add-node-symbol">&#10010;</span>
+    </div>
 </div>
 
 <div class="d-flex justify-content-between">
-    <ngb-pagination [collectionSize]="page.collectionSize" [page]="page.index" (pageChange)="page.index = $event; api.PageIndex = page.index;" [directionLinks]="false" [pageSize]="currentPageSize"></ngb-pagination>
+    <ngb-pagination [collectionSize]="page.collectionSize" [page]="page.index" (pageChange)="page.index = $event; api.PageIndex = $event; apiGetPageNodes();" [directionLinks]="false" [pageSize]="currentPageSize"></ngb-pagination>
 
     <div ngbDropdown class="d-inline-block">
         <button ngDefaultControl class="btn btn-outline-primary" id="dropdownBasic1" ngbDropdownToggle [(ngModel)]="page.size">{{ currentPageSize }} items per page</button>
-        <div #dd ngbDropdownMenu aria-labelledby="dropdownBasic1">
-            <button *ngFor="let size of page.size; index as i;" ngbDropdownItem (click)="page.sizeDropdownSelectedItem = i; api.SizeDropDownItem = i;">{{ size }} items per page</button>
+        <div #dd ngbDropdownMenu aria-labelledby="dropdownBasic1" style="right: 0 !important;">
+            <button *ngFor="let size of page.size; index as i;" ngbDropdownItem (click)="page.sizeDropdownSelectedItem = i; api.SizeDropDownItem = i; apiGetPageNodes()">{{ size }} items per page</button>
         </div>
     </div>
 </div>

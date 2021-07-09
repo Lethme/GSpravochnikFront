@@ -39,11 +39,11 @@ export class API {
     loadingSwitch() { API.loading = !API.loading; }
 
     public saveData(dataName: string, dataValue: any) {
-        API.storage.setItem(dataName, JSON.stringify(dataValue));
+        API.storage.setItem(dataName + ':' + this.UserId, JSON.stringify(dataValue));
     }
 
     public getData<T>(dataName: string): T | undefined {
-        let data = API.storage.getItem(dataName);
+        let data = API.storage.getItem(dataName + ':' + this.UserId);
         if (data === null) return undefined;
         let TData: T = JSON.parse(data);
         return TData;
@@ -69,8 +69,26 @@ export class API {
     public get UserId(): string { return this.cookie.get(this.UserIdCookie); }
     public get Authorized(): boolean { return this.UserToken !== ''; }
 
-    public getUrl(path: string): string {
-        return this.Host + '/' + this.Path + '/' + path;
+    public getUrl(path: string, options: {} = {}): string {
+        let keysArr = Object.keys(options);
+        let valuesArr = Object.values(options);
+        let arr = [];
+        for (let i = 0; i < keysArr.length; i++) {
+            arr.push({ key: keysArr[i], value: valuesArr[i] })
+        }
+        let url = this.Host + '/' + this.Path + '/' + path;
+        if (arr.length !== 0) {
+            url += '?'
+            arr.forEach((obj, index) => {
+                if (index !== arr.length - 1) {
+                    url += obj.key + '=' + obj.value + '&';
+                } else {
+                    url += obj.key + '=' + obj.value;
+                }
+            })
+        }
+
+        return url;
     }
 
     public logout() {
