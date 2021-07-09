@@ -1,4 +1,4 @@
-import { User } from './../data/user/app.user';
+import { API } from './../data/api/app.api';
 import { Component, OnInit } from '@angular/core';
 
 @Component({
@@ -7,16 +7,6 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./login-form.component.scss']
 })
 export class LoginFormComponent implements OnInit {
-  constructor() { }
-
-  register: boolean = false;
-
-  registerSwitch() { this.register = !this.register; }
-
-  ngOnInit(): void {
-  }
-
-  auth(login: string, pass: string) {
-    User.authorizeUser(login, pass);
-  }
+  constructor(public api: API) { }
+  ngOnInit(): void { }
 }

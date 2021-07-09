@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { API } from './data/api/app.api';
+import { Component, OnInit } from '@angular/core';
 import { User } from "./data/user/app.user";
 
 export enum AppState {
@@ -7,7 +8,7 @@ export enum AppState {
 }
 
 export let CurrentState = {
-  state: AppState.Auth
+  state: AppState.App
 }
 
 @Component({
@@ -15,9 +16,18 @@ export let CurrentState = {
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent {
-  constructor() {  }
+export class AppComponent implements OnInit {
+  constructor(public api: API) {  }
+  ngOnInit() {
+    if (this.api.UserToken === '') {
+      CurrentState.state = AppState.Auth;
+      this.api.Register = false;
+    } else {
+      CurrentState.state = AppState.App;
+    }
+  }
+
   title = 'AngularTestApp';
-  
+
   get showAuthForm(): boolean { return CurrentState.state === AppState.Auth ? true : false; }
 }

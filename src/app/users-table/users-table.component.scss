@@ -1,19 +1,56 @@
+* {
+    font-family: 'Montserrat', sans-serif;
+}
+
 .modal-body-line {
     margin-bottom: .01rem;
 }
 
 .card-close-times {
     color: #000;
+    font-size: 1.5em;
     transition: all .1s ease;
+    cursor: pointer;
 }
 
 .card-close-times:hover {
     color: #000B;
 }
 
+.table-edit,
+.table-delete {
+    color: #000;
+    font-size: 1.3em;
+    font-weight: 600;
+    transition: all .2s ease;
+    cursor: pointer;
+}
+
+.table-edit:hover,
+.table-delete:hover {
+    color: #0009;
+}
+
 .table {
     border: 1px solid #dee2e6;
-    border-radius: 1rem;
+    margin: 0 !important;
+    padding: 0 !important;
+    thead,
+    tbody {
+        font-size: .8rem;
+    }
+}
+
+.dropdown-toggle,
+.dropdown-menu,
+ngb-pagination {
+    font-size: .8rem !important;
+    margin-bottom: 0 !important;
+}
+
+.dropdown-toggle::after {
+    font-size: 1rem;
+    vertical-align: middle;
 }
 
 .form-group,
@@ -26,4 +63,27 @@
 .form-inline {
     display: flex;
     flex-direction: column;
+}
+
+.add-node {
+    width: 100%;
+    margin-bottom: .5rem;
+    padding: .3rem 0;
+    border: 1px solid #dee2e6;
+    border-top: none;
+    display: flex;
+    justify-content: center;
+    background: #fff;
+    color: #000;
+    transition: all .2s ease;
+    cursor: pointer;
+    .add-node-symbol {
+        font-size: 1.2rem;
+    }
+}
+
+.add-node:hover {
+    background: rgb(0, 123, 255);
+    color: #fff;
+    box-shadow: 0px 0px 8px 4px rgba(34, 60, 80, 0.2) inset;
 }

@@ -1,7 +1,7 @@
 <div class="login-form">
     <mat-card class="login-card">
         <mat-card-content>
-            <h2 style="text-align: center;">{{ register ? 'Registration' : 'Login' }}</h2>
+            <h2 style="text-align: center;">{{ api.Register ? 'Sign Up' : 'Sign In' }}</h2>
             <form class="login-form">
                 <mat-form-field class="full-width">
                     <mat-label>Login</mat-label>
@@ -11,20 +11,22 @@
                     <mat-label>Password</mat-label>
                     <input #passField type="password" matInput placeholder="Password" name="pass" required>
                 </mat-form-field>
-                <mat-form-field class="full-width" *ngIf="register">
+                <mat-form-field class="full-width" [ngStyle]="{
+                        'display': api.Register ? 'block' : 'none'
+                    }">
                     <mat-label>Confirm Password</mat-label>
                     <input #repassField type="password" matInput placeholder="Confirm Password" name="repass" required>
                 </mat-form-field>
             </form>
         </mat-card-content>
         <mat-card-actions class="login-form-btns">
-            <div *ngIf="!register; else registerBtns;">
-                <button mat-raised-button (click)="auth(loginField.value, passField.value)" color="primary">Login</button>
-                <button mat-raised-button (click)="registerSwitch()" color="primary">Registration</button>
+            <div *ngIf="!api.Register; else registerBtns;">
+                <button mat-raised-button (click)="api.authorizeUser(loginField.value, passField.value)" color="primary">Login</button>
+                <button mat-raised-button (click)="api.registerSwitch()" color="primary">Sign Up</button>
             </div>
             <ng-template #registerBtns>
-                <button mat-raised-button onclick="alert('Registration is not working yet')" color="primary">Register</button>
-                <button mat-raised-button (click)="registerSwitch()" color="primary">Back</button>
+                <button mat-raised-button (click)="api.registerUser(loginField.value, passField.value, repassField.value)" color="primary">Register</button>
+                <button mat-raised-button (click)="api.registerSwitch()" color="primary">Cancel</button>
             </ng-template>
         </mat-card-actions>
     </mat-card>

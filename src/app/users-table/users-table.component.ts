@@ -1,24 +1,44 @@
+import { API } from './../data/api/app.api';
+import { INode } from './../data/node/app.node';
 import { Component, Input, TemplateRef } from '@angular/core';
 import { NgbModal, NgbDateStruct, NgbTimeStruct } from '@ng-bootstrap/ng-bootstrap';
-import { Node } from '../data/node/app.node';
+import { Node, INewNode } from '../data/node/app.node';
+import { HttpClient, HttpHeaders, HttpResponse, HttpResponseBase } from '@angular/common/http';
+import { CookieService } from 'ngx-cookie-service';
+import { AppState, CurrentState } from '../app.component';
 
 export interface ICardInfo {
-  type: 'msg' | 'ti' | 'dp' | 'tp';
+  type: 'add' | 'edit';
   title: string;
   date: Date;
   time: NgbTimeStruct;
   cardLines: Array<string>;
   colTitles: Array<string>;
+  node: Node | null;
 }
 
-const Nodes: Array<Node> = [
-  Node.Create(0, 0, 'Dimass', 'Semochkin', 'Olegovich', 'No Walls Production', '88005553535', new Date(), new Date()),
-  Node.Create(1, 0, 'Ivan', 'Ivanov', 'Ivanovich', 'No Walls Production', '+74468487636', new Date(), new Date()),
-  Node.Create(2, 0, 'Test', 'Testov', 'Testovich', 'No Walls Production', '33563563565', new Date(), new Date()),
-  Node.Create(3, 0, 'JHGJHK', 'Testov', 'Testovich', 'No Walls Production', '33563563565', new Date(), new Date()),
-  Node.Create(4, 0, 'GOVNO', 'Testov', 'Testovich', 'No Walls Production', '33563563565', new Date(), new Date()),
-  Node.Create(5, 0, 'DHKJHDKJG', 'Testov', 'Testovich', 'No Walls Production', '33563563565', new Date(), new Date())
-];
+export interface IPageInfo {
+  index: number;
+  size: Array<number>;
+  collectionSize: number;
+  sizeDropdownSelectedItem: number;
+}
+
+export interface ITableInfo {
+  headers: Array<string>;
+}
+
+// const Nodes: Array<Node> = [
+//   new Node(0, 0, 'Dimass', 'Semochkin', 'Olegovich', 'No Walls Production', '88005553535', 'govno@mail.ru', new Date(), new Date(), true),
+//   new Node(1, 0, 'FDFGDSF', 'GDGDGH', 'dghdgh', 'No Walls Production', '88005553535', 'govno@mail.ru', new Date(), new Date(), true),
+//   new Node(2, 0, 'dghdghd', 'Semocdghdghhkin', 'Olegovich', 'No Walls Production', '88005553535', 'govno@mail.ru', new Date(), new Date(), true),
+//   new Node(3, 0, 'Dimadghdghdgss', 'Semochkin', 'Olegovich', 'No Walls Production', '88005553535', 'govno@mail.ru', new Date(), new Date(), true),
+//   new Node(4, 0, 'dghdg', 'Semochkin', 'Olegovich', 'No Walls Production', '88005553535', 'govno@mail.ru', new Date(), new Date(), true),
+//   new Node(5, 0, 'ghdgdghdgh', 'dghdghdg', 'Olegovich', 'No Walls Production', '88005553535', 'govno@mail.ru', new Date(), new Date(), true),
+//   new Node(6, 0, 'Dimdghdghass', 'dghdg365', 'Olegovich', 'No Walls Production', '88005553535', 'govno@mail.ru', new Date(), new Date(), true)
+// ];
+
+const Nodes: Array<Node> = [];
 
 @Component({
   selector: 'app-users-table',
@@ -27,72 +47,234 @@ const Nodes: Array<Node> = [
 })
 export class UsersTableComponent {
   card: ICardInfo = {
-    type: 'msg',
+    type: 'edit',
     title: 'Card Title',
     date: new Date(),
     time: { hour: 0, minute: 0, second: 0 },
     cardLines: [''],
-    colTitles: ['']
+    colTitles: [''],
+    node: null
   }
-
+  page: IPageInfo = {
+    index: this.api.PageIndex,
+    size: [ 2, 4, 6, 8, 10 ],
+    collectionSize: 0,
+    sizeDropdownSelectedItem: this.api.SizeDropDownItem
+  }
+  table: ITableInfo = {
+    headers: [
+      'Name',
+      'Company',
+      'Phone',
+      'Email'
+    ]
+  }
+  
   nodes: Array<Node> = Nodes;
-  page = 1;
-  pageSize: Array<number> = [ 2, 4, 6, 8, 10 ];
-  selectedItem = 1;
-
   model: NgbDateStruct | undefined;
 
+  constructor(public modalService: NgbModal, private http: HttpClient, private cookie: CookieService, public api: API) {}
+  ngOnInit(): void {
+    this.apiGetNodes();
+  }
+  
   get collectionSize(): number { return this.nodes.length; }
-  get currentPageSize(): number { return this.pageSize[this.selectedItem]; }
+  get currentPageSize(): number { return this.page.size[this.page.sizeDropdownSelectedItem]; }
+  get userToken(): string { return this.cookie.get('authToken'); }
+  
+  public get userName(): string { return this.cookie.get('authLogin'); }
 
   getPagedNodes(): Array<Node> {
-    return this.nodes.slice((this.page - 1) * this.currentPageSize, (this.page - 1) * this.currentPageSize + this.currentPageSize);
+    return this.nodes.slice((this.page.index - 1) * this.currentPageSize, (this.page.index - 1) * this.currentPageSize + this.currentPageSize);
   }
 
-  constructor(public modalService: NgbModal) {}
+  apiGetNodes() {
+    if (this.api.Authorized) {
+      this.api.Loading = true;
+      this.http.get<any>(this.api.getUrl('nodes'), {
+        headers: this.api.AuthHeader
+      }).subscribe(data => {
+        let nodesCount: number = data.meta.count;
+        let arr: Array<any> = data.data;
+        let arr1: Array<INode> = arr.map(node => {
+          return node.attributes;
+        });
+        if (arr1[0] !== undefined) {
+          this.nodes = arr1.map(node => Node.Create(node));
+        } else {
+          this.nodes = [];
+        }
+        this.page.collectionSize = nodesCount;
+        this.api.Loading = false;
+      }, err => {
+        console.log(err);
+        this.api.Loading = false;
+      });
+    } else {
+      CurrentState.state = AppState.Auth;
+    }
+  }
 
-  public showMsg(content: TemplateRef<any>, title: string = 'Card Title', cardLine: Array<string> = []) {
-    this.card.type = 'msg';
-    this.card.title = title;
-    this.card.cardLines = cardLine;
+//nodes?pageSize={pageSize}&pageNum={pageNum}
+
+  apiGetPageNodes() {
+    if (this.api.Authorized) {
+      this.api.Loading = true;
+      this.http.get<any>(this.api.getUrl('nodes?pageSize=' + this.currentPageSize + '&pageNum=' + this.page.index), {
+        headers: this.api.AuthHeader
+      }).subscribe(data => {
+        this.api.Loading = false;
+      }, err => {
+        console.log(err);
+        this.api.Loading = false;
+      });
+    } else {
+      CurrentState.state = AppState.Auth;
+    }
+  }
+
+  apiSetNode(nodeId: number, node: Node | undefined) {
+    if (this.api.Authorized) {
+      this.api.Loading = true;
+      this.http.patch<any>(this.api.getUrl('nodes/' + nodeId), JSON.stringify({
+        nodeName: node?.Name,
+        nodeLastName: node?.LastName,
+        nodePatronymic: node?.Patronymic,
+        nodeCompany: node?.Company,
+        nodePhone: node?.Phone,
+        nodeEmail: node?.Email,
+        isPublic: node?.Public
+      }), {
+        headers: this.api.AuthHeader
+      }).subscribe(data => { this.api.Loading = false; }, err => {
+        let status: number = err.status;
+        switch(status) {
+          case 400: {
+            let errors: Array<string> = err.error.errors;
+            alert(errors.join('\n'));
+            break;
+          }
+          case 500: {
+            console.log(err);
+          }
+        }
+        this.api.Loading = false;
+      });
+    } else {
+      CurrentState.state = AppState.Auth;
+    }
+  }
+
+  apiDeleteNode(nodeId: number) {
+    if (this.api.Authorized) {
+      this.api.Loading = true;
+      this.http.delete<any>(this.api.getUrl('nodes/' + nodeId), {
+        headers: this.api.AuthHeader
+      }).subscribe(data => { 
+        this.apiGetNodes();
+        this.api.Loading = false;
+      }, err => {
+        let status: number = err.status;
+        switch(status) {
+          case 400: {
+            let errors: Array<string> = err.error.errors;
+            alert(errors.join('\n'));
+            break;
+          }
+          case 500: {
+            console.log(err);
+          }
+        }
+        this.api.Loading = false;
+      });
+    } else {
+      CurrentState.state = AppState.Auth;
+    }
+  }
+
+  apiAddNode(newNode: INewNode) {
+    if (this.api.Authorized) {
+      this.api.Loading = true;
+      this.http.post<any>(this.api.getUrl('nodes/'), JSON.stringify({
+        nodeName: newNode.name,
+        nodeLastName: newNode.lastName,
+        nodePatronymic: newNode.patronymic,
+        nodeCompany: newNode.company,
+        nodePhone: newNode.phone,
+        nodeEmail: newNode.email,
+        isPublic: false
+      }), {
+        headers: this.api.AuthHeader
+      }).subscribe(data => {
+        this.page.collectionSize++;
+        if (this.page.collectionSize % this.currentPageSize === 1) {
+          this.page.index++;
+        }
+        this.apiGetNodes();
+      }, err => {
+        let status: number = err.status;
+        switch(status) {
+          case 400: {
+            let errors: Array<string> = err.error.errors;
+            alert(errors.join('\n'));
+            break;
+          }
+          case 500: {
+            console.log(err);
+          }
+        }
+        this.api.Loading = false;
+      });
+    } else {
+      CurrentState.state = AppState.Auth;
+    }
+  }
+
+  showNodeEditor(content: TemplateRef<any>, node: Node) {
+    this.card.type = 'edit';
+    this.card.node = node;
     this.modalService.open(content, {
       size: 'xl',
       centered: true
     });
   }
 
-  public showTextInput(content: TemplateRef<any>, title: string = 'Card Title', colTitles: Array<string> = [''], cellValues: Array<string> = ['']) {
-    this.card.type = 'ti';
-    this.card.title = title;
-    this.card.colTitles = colTitles;
-    this.card.cardLines = cellValues;
+  showNewNodeEditor(content: TemplateRef<any>) {
+    this.card.type = 'add';
+    this.card.node = Node.CreateEmpty();
     this.modalService.open(content, {
       size: 'xl',
       centered: true
     });
   }
 
-  public showDatePicker(content: TemplateRef<any>, title: string = 'Card Title', date: Date = new Date()) {
-    this.card.type = 'dp';
-    this.card.title = title;
-    this.card.date = date;
+  showConfirm(content: TemplateRef<any>, node: Node) {
+    this.card.node = node;
     this.modalService.open(content, {
       size: 'xl',
       centered: true
     });
   }
 
-  public showTimePicker(content: TemplateRef<any>, title: string = 'Card Title', time: NgbTimeStruct = { hour: 0, minute: 0, second: 0 }) {
-    this.card.type = 'tp';
-    this.card.title = title;
-    this.card.time = time;
-    this.modalService.open(content, {
-      size: 'xl',
-      centered: true
-    });
+  getNode(userId: number, nodeId: number) : Node | undefined {
+    return this.nodes.find(node => node.UserId === userId && node.NodeId === nodeId);
   }
 
-  test(e: HTMLInputElement, index: number) {
-    this.card.cardLines[index] = e.value;
+  editNode(userId: number, nodeId: number, newNode: INewNode) {
+    this.api.Loading = true;
+    let node = this.getNode(userId, nodeId);
+    if (node !== undefined) {
+      node.Update(newNode);
+    }
+    this.apiSetNode(nodeId, node);
+    this.apiGetNodes();
+  }
+
+  addNode(newNode: INewNode) {
+    this.apiAddNode(newNode);
+  }
+
+  deleteNode(userId: number, nodeId: number) {
+    this.apiDeleteNode(nodeId);
   }
 }

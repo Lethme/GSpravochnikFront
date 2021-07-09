@@ -1,41 +1,74 @@
-<ng-template #content let-modal>
+<ng-template #deleteRef let-modal>
     <div class="modal-header">
-        <h4 class="modal-title">{{ card.title }}</h4>
+        <h4 class="modal-title" id="modal-title">Node deletion</h4>
+        <button type="button" class="close" aria-describedby="modal-title" (click)="modal.dismiss('Cross click')">
+            <span class="card-close-times" aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <p><strong>Are you sure you want to delete <span class="text-primary">{{ card.node!.Name }}</span> node?</strong></p>
+        <p>All information associated to this node will be permanently deleted.
+            <span class="text-danger">This operation can not be undone.</span>
+        </p>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss('cancel click')">Cancel</button>
+        <button type="button" class="btn btn-danger" (click)="deleteNode(card.node!.UserId, card.node!.NodeId); modal.close('Delete click')">Delete</button>
+    </div>
+</ng-template>
+
+<ng-template #editRef let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title">{{ card.type === 'edit' ? card.node!.Name : 'Node creation' }}</h4>
         <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')" style="outline: none;">
         <span class="card-close-times" aria-hidden="true">&times;</span>
       </button>
     </div>
-    <div class="modal-body" [ngSwitch]="card.type">
-        <div *ngSwitchCase="'msg'">
-            <p class="modal-body-line" *ngFor='let line of card.cardLines; index as i;'>
-                <mat-form-field class="example-full-width card-input" appearance="fill">
-                    <mat-label>{{ line }}</mat-label>
-                    <input matInput #cardInput [name]="card.title" [placeholder]="line" [value]="line" (change)="test(cardInput, i);">
-                </mat-form-field>
-            </p>
-        </div>
-        <form *ngSwitchCase="'dp'" class="form-inline">
-            <div class="form-group">
-                <div class="input-group">
-                    <input class="form-control" placeholder="yyyy-mm-dd" name="dp" [(ngModel)]="model" ngbDatepicker #d="ngbDatepicker">
-                    <div class="input-group-append">
-                        <button class="btn btn-outline-secondary calendar" (click)="d.toggle()" type="button"></button>
-                    </div>
-                </div>
-            </div>
-        </form>
-        <div *ngSwitchCase="'tp'">
-            <ngb-timepicker [(ngModel)]="card.time" [seconds]="true"></ngb-timepicker>
-        </div>
-        <form *ngSwitchCase="'ti'" class="form-inline">
-            <mat-form-field class="full-width" *ngFor="let value of card.cardLines; index as i;">
-                <mat-label>{{ card.colTitles[i] }}</mat-label>
-                <input matInput [placeholder]="card.colTitles[i]" name="login" [value]="value" required>
-            </mat-form-field>
-        </form>
+    <div class="modal-body">
+        <mat-form-field class="full-width">
+            <mat-label>Last Name</mat-label>
+            <input #lastName matInput placeholder="Last Name" [value]="card.node!.LastName" required>
+        </mat-form-field>
+        <mat-form-field class="full-width">
+            <mat-label>Name</mat-label>
+            <input #name matInput placeholder="Name" [value]="card.node!.Name" required>
+        </mat-form-field>
+        <mat-form-field class="full-width">
+            <mat-label>Patronymic</mat-label>
+            <input #patronymic matInput placeholder="Patronymic" [value]="card.node!.Patronymic" required>
+        </mat-form-field>
+        <mat-form-field class="full-width">
+            <mat-label>Company</mat-label>
+            <input #company matInput placeholder="Company" [value]="card.node!.Company" required>
+        </mat-form-field>
+        <mat-form-field class="full-width">
+            <mat-label>Email</mat-label>
+            <input #email matInput placeholder="Email" [value]="card.node!.Email" required>
+        </mat-form-field>
+        <mat-form-field class="full-width">
+            <mat-label>Phone</mat-label>
+            <input #phone matInput placeholder="Phone" [value]="card.node!.Phone" required>
+        </mat-form-field>
     </div>
     <div class="modal-footer">
-        <button type="button" class="btn btn-light" onclick="alert('Not implemented yet')">Edit</button>
+        <button *ngIf="card.type === 'edit'; else addBtn;" type="button" class="btn btn-light" (click)="editNode(card.node!.UserId, card.node!.NodeId, { 
+            lastName: lastName.value,
+            name: name.value,
+            patronymic: patronymic.value,
+            company: company.value,
+            phone: phone.value,
+            email: email.value
+         }); modal.close('Close click');">Apply</button>
+        <ng-template #addBtn>
+            <button type="button" class="btn btn-light" (click)="addNode({
+                lastName: lastName.value,
+                name: name.value,
+                patronymic: patronymic.value,
+                company: company.value,
+                phone: phone.value,
+                email: email.value
+            }); modal.close('Close click');">Add</button>
+        </ng-template>
         <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Close</button>
     </div>
 </ng-template>
@@ -43,52 +76,37 @@
 <table class="table table-striped">
     <thead>
         <tr>
-            <th scope="col">Id</th>
-            <th scope="col">Name</th>
-            <th scope="col">Company</th>
-            <th scope="col">Phone</th>
-            <th scope="col">Update date</th>
-            <th scope="col">Creation date</th>
+            <th scope="col" *ngFor="let header of table.headers">{{ header }}</th>
+            <th scope="col">Edit</th>
+            <th scope="col">Delete</th>
         </tr>
     </thead>
     <tbody>
         <tr *ngFor="let node of getPagedNodes(); index as i">
-            <th scope="row">{{ node.UserId }}</th>
-            <td>
-                <a href="#" class="table-link" (click)="showTextInput(content, node.Name, [
-                    'Last Name',
-                    'First Name',
-                    'Patronymic'
-                ], [
-                    node.LastName,
-                    node.Name,
-                    node.Patronymic
-                ])">{{ node.LastName + ' ' + node.Name + ' ' + node.Patronymic }}</a>
-            </td>
+            <td>{{ node.LastName + ' ' + node.Name + ' ' + node.Patronymic }}</td>
             <td>{{ node.Company }}</td>
             <td>{{ node.Phone| phone:'RU' }}</td>
+            <td>{{ node.Email }}</td>
             <td>
-                <a href="#" class="table-link" (click)="showDatePicker(content, node.Name)">{{ node.LastUpdateDate | date }}</a>
+                <span class="table-edit" (click)="showNodeEditor(editRef, node)">&#9998;</span>
             </td>
             <td>
-                <a href="#" class="table-link" (click)="showDatePicker(content, node.Name)">{{ node.CreationDate | date }}</a>
+                <span class="table-delete" (click)="showConfirm(deleteRef, node);">&#10006;</span>
             </td>
         </tr>
     </tbody>
 </table>
+<div class="add-node" (click)="showNewNodeEditor(editRef)">
+    <span class="add-node-symbol">&#10010;</span>
+</div>
 
-<div class="d-flex justify-content-between p-2">
-    <ngb-pagination [collectionSize]="collectionSize" [(page)]="page" [directionLinks]="false" [pageSize]="pageSize[selectedItem]"></ngb-pagination>
+<div class="d-flex justify-content-between">
+    <ngb-pagination [collectionSize]="page.collectionSize" [page]="page.index" (pageChange)="page.index = $event; api.PageIndex = page.index;" [directionLinks]="false" [pageSize]="currentPageSize"></ngb-pagination>
 
     <div ngbDropdown class="d-inline-block">
-        <button ngDefaultControl class="btn btn-outline-primary" id="dropdownBasic1" ngbDropdownToggle [(ngModel)]="pageSize">{{ currentPageSize }} items per page</button>
+        <button ngDefaultControl class="btn btn-outline-primary" id="dropdownBasic1" ngbDropdownToggle [(ngModel)]="page.size">{{ currentPageSize }} items per page</button>
         <div #dd ngbDropdownMenu aria-labelledby="dropdownBasic1">
-            <button *ngFor="let size of pageSize; index as i;" ngbDropdownItem (click)="selectedItem = i;">{{ size }} items per page</button>
+            <button *ngFor="let size of page.size; index as i;" ngbDropdownItem (click)="page.sizeDropdownSelectedItem = i; api.SizeDropDownItem = i;">{{ size }} items per page</button>
         </div>
     </div>
-    <!-- <select class="custom-select" style="width: auto" [(ngModel)]="pageSize">
-      <option [ngValue]="2">2 items per page</option>
-      <option [ngValue]="4">4 items per page</option>
-      <option [ngValue]="6">6 items per page</option>
-    </select> -->
 </div>

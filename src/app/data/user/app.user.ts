@@ -19,29 +19,39 @@ export class User implements IUser {
   public get UserPassword(): string { return this.user_passwd; }
   public get RegisterDate(): Date { return this.user_reg_date; }
 
-  public static async getUsers(): Promise<Array<User>> {
-    return new Promise<Array<User>>(resolve => {
-      fetch('//3.122.244.77/spravochnik/').then(res => res.json()).then(res => {
-        let arr: Array<User> = res;
-        resolve(res);
-      });
-    });
-  }
+  // public static async authorizeUser(login: string, password: string) {
+  //   return new Promise(resolve => {
+  //     fetch('http://52.28.238.133/api/1.1/auth', {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-type': 'application/json; charset=UTF-8',
+  //         'Access-Control-Allow-Origin': '*'
+  //       },
+  //       body: JSON.stringify({
+  //         userLogin: login,
+  //         userPassword: password
+  //       })
+  //      }).then(res => res.json()).then(res => {
+  //       console.log(res);
+  //      })
+  //   });
+  // }
 
-  public static async authorizeUser(login: string, password: string) {
-    return new Promise(resolve => {
-      fetch('//3.122.244.77/api/1.1/auth', {
-        method: 'POST',
-        headers: {
-          'Content-type': 'application/x-www-form-urlencoded; charset=UTF8'
-        },
-        body: JSON.stringify({
-          userLogin: login,
-          userPassword: password
-        })
-       }).then(res => res.json()).then(res => {
-        console.log(res);
-       })
-    });
-  }
+  // public static async registerUser(login: string, password: string) {
+  //   return new Promise(resolve => {
+  //     fetch('http://52.28.238.133/api/1.1/registry ', {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-type': 'application/json; charset=UTF-8',
+  //         'Access-Control-Allow-Origin': '*'
+  //       },
+  //       body: JSON.stringify({
+  //         userLogin: login,
+  //         userPassword: password
+  //       })
+  //      }).then(res => res.json()).then(res => {
+  //       console.log(res);
+  //      })
+  //   });
+  // }
 }

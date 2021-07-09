@@ -1,3 +1,4 @@
+import { MatIconModule } from '@angular/material/icon';
 import { NgModule } from '@angular/core';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { BrowserModule } from '@angular/platform-browser';
@@ -8,23 +9,25 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCardModule } from '@angular/material/card'
 import { FormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { AppComponent } from './app.component';
-import { NavComponent } from './nav/nav.component';
 import { NavigationComponent } from './navigation/navigation.component';
 import { UsersTableComponent } from "./users-table/users-table.component";
 import { LoginFormComponent } from './login-form/login-form.component';
+import { LoaderComponent } from './loader/loader.component';
 
 import { PhonePipe } from './phone.pipe';
 
 @NgModule({
   declarations: [
     AppComponent,
-    NavComponent,
     NavigationComponent,
     UsersTableComponent,
     PhonePipe,
-    LoginFormComponent
+    LoginFormComponent,
+    LoaderComponent
   ],
   imports: [
     BrowserModule,
@@ -35,7 +38,10 @@ import { PhonePipe } from './phone.pipe';
     MatInputModule,
     MatSelectModule,
     FormsModule,
-    MatCardModule
+    MatCardModule,
+    MatIconModule,
+    HttpClientModule,
+    MatProgressSpinnerModule
   ],
   providers: [],
   bootstrap: [AppComponent]

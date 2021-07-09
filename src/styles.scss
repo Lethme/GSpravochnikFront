@@ -4,19 +4,23 @@
 body {
     box-sizing: border-box;
     height: 100vh !important;
-    //display: flex;
-    //justify-content: center;
-    //align-items: center;
+    margin: 0;
+    font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+* {
+    z-index: 1;
+}
+
+ol,
+ul,
+dl {
+    margin-bottom: 0 !important;
 }
 
 html,
 body {
     height: 100%;
-}
-
-body {
-    margin: 0;
-    font-family: Roboto, "Helvetica Neue", sans-serif;
 }
 
 .visually-hidden {
@@ -26,4 +30,14 @@ body {
 .modal-xl {
     max-width: 1200px !important;
     padding: 0 15px !important;
+}
+
+.loader-bg,
+.loader-bg * {
+    z-index: 100 !important;
+}
+
+app-navigation,
+app-navigation * {
+    z-index: 99 !important;
 }
