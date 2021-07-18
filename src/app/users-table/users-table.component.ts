@@ -86,9 +86,6 @@ export class UsersTableComponent {
   }
 
   get currentPageSize(): number { return this.page.size[this.page.sizeDropdownSelectedItem]; }
-  get userToken(): string { return this.cookie.get('authToken'); }
-  
-  public get userName(): string { return this.cookie.get('authLogin'); }
 
   apiGetNodes() {
     if (this.api.Authorized) {

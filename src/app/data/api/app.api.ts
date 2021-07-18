@@ -21,12 +21,16 @@ export class API {
     static loading: boolean = false;
     static storage: Storage = window.localStorage;
 
-    public Host: string = 'http://52.28.238.133';
+    public Protocol: string = 'http'
+    public Host: string = '52.28.238.133';
     public Path: string = 'api/1.1';
     
     public get AuthHeader(): HttpHeaders { 
         return new HttpHeaders({
-             'Authorization': 'Bearer ' + this.UserToken 
+             'Authorization': 'Bearer ' + this.UserToken,
+             'Access-Control-Allow-Origin': '*',
+             'Access-Control-Allow-Headers': '*',
+             'Access-Control-Allow-Methods': '*'
         });
     }
 
@@ -76,7 +80,7 @@ export class API {
         for (let i = 0; i < keysArr.length; i++) {
             arr.push({ key: keysArr[i], value: valuesArr[i] })
         }
-        let url = this.Host + '/' + this.Path + '/' + path;
+        let url = this.Protocol !== '' ? this.Protocol + '://' + this.Host + '/' + this.Path + '/' + path : '//' + this.Host + '/' + this.Path + '/' + path;
         if (arr.length !== 0) {
             url += '?'
             arr.forEach((obj, index) => {
@@ -169,5 +173,37 @@ export class API {
         } else {
             alert('Password mismatch');
         }
+    }
+
+    public getNodes(): Promise<{ collectionSize: number, nodes: Array<Node> }> {
+        return new Promise((resolve, reject) => {
+            if (this.Authorized) {
+                this.Loading = true;
+                this.client.get<any>(this.getUrl('nodes'), {
+                    headers: this.AuthHeader
+                }).subscribe(data => {
+                    let nodesCount: number = data.meta.count;
+                    let arr: Array<any> = data.data;
+                    let arr1: Array<INode> = arr.map(node => {
+                        return node.attributes;
+                    });
+                    let nodes: Array<Node> = [];
+                    if (arr1[0] !== undefined) {
+                        nodes = arr1.map(node => Node.Create(node));
+                    }
+                    this.Loading = false;
+                    resolve({
+                        collectionSize: nodesCount,
+                        nodes: nodes
+                    });
+                }, err => {
+                    this.Loading = false;
+                    console.log(err);
+                    reject(err);
+                });
+            } else {
+                CurrentState.state = AppState.Auth;
+            }
+        });
     }
 }
